@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:som_mobile/screen/admin.dart';
+import 'package:som_mobile/screen/admin/add_schedule.dart';
 import 'package:som_mobile/screen/auth/login.dart';
 import 'package:som_mobile/screen/auth/signup.dart';
 import 'package:som_mobile/screen/homepage.dart';
@@ -25,14 +26,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'SOM Mobile',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const LoginScreen(), // Your login screen
+        '/': (context) => const LoginScreen(),
+        // '/': (context) => const LoginScreen(), // Your login screen
         '/signup': (context) => const SignupScreen(), // Your signup screen
         '/home': (context) => const MainPage(), // Your home screen
       },

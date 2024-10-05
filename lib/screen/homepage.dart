@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:som_mobile/const/app_color.dart';
+import 'package:som_mobile/util/build_appbar.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -8,10 +10,11 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  @override
+  @override 
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Homepage'),),
-    );
+  appBar: BuildAppbar(title: 'SOM Mobile'),
+  body: Center(child: Text('Welcome to the homepage!')),
+);
   }
 }

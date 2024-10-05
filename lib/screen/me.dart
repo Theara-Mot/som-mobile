@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:som_mobile/util/build_appbar.dart';
 
 class UserDataScreen extends StatelessWidget {
   const UserDataScreen({Key? key}) : super(key: key);
@@ -59,14 +60,14 @@ class UserDataScreen extends StatelessWidget {
 
     if (user == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('User Data')),
+        appBar:BuildAppbar(title: 'Profile'),
         body: Center(child: Text('No user is signed in.')),
       );
     }
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(title: const Text('User Data')),
+      appBar:BuildAppbar(title: 'Profile'),
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
         builder: (context, snapshot) {
@@ -88,20 +89,20 @@ class UserDataScreen extends StatelessWidget {
 
           return Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('User Information', style: Theme.of(context).textTheme.headlineSmall),
-                const Divider(),
-                buildTile(Icons.person, 'Name: ${data['name']}'),
-                buildTile(Icons.transgender, 'Gender: ${data['gender']}'),
-                buildTile(Icons.cake, 'Date of Birth: ${DateFormat('yyyy-MM-dd').format(data['dob'].toDate())}'),
-                buildTile(Icons.phone, 'Phone: ${data['phone']}'),
-                buildTile(Icons.grade, 'Level: ${data['level']}'),
-                buildTile(Icons.subject, 'Main Subject: ${data['mainSubject']}'),
-                buildTile(Icons.date_range, 'Join Date: ${DateFormat('yyyy-MM-dd').format(joinDate)}'),
-                buildTile(Icons.access_time, 'Duration Worked: ${duration['years']} years, ${duration['months']} months, ${duration['days']} days'),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  buildTile(Icons.person, 'Name: ${data['name']}'),
+                  buildTile(Icons.transgender, 'Gender: ${data['gender']}'),
+                  buildTile(Icons.cake, 'Date of Birth: ${DateFormat('yyyy-MM-dd').format(data['dob'].toDate())}'),
+                  buildTile(Icons.phone, 'Phone: ${data['phone']}'),
+                  buildTile(Icons.grade, 'Level: ${data['level']}'),
+                  buildTile(Icons.subject, 'Main Subject: ${data['mainSubject']}'),
+                  buildTile(Icons.date_range, 'Join Date: ${DateFormat('yyyy-MM-dd').format(joinDate)}'),
+                  buildTile(Icons.access_time, 'Duration Worked: ${duration['years']} years, ${duration['months']} months, ${duration['days']} days'),
+                ],
+              ),
             ),
           );
         },

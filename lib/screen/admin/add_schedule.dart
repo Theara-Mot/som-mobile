@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:som_mobile/util/build_button.dart';
 
 class AddSchedule extends StatefulWidget {
   @override
@@ -9,7 +10,8 @@ class AddSchedule extends StatefulWidget {
 class _AddScheduleState extends State<AddSchedule> {
   final _formKey = GlobalKey<FormState>();
   String? _selectedUserId; // For storing the selected user ID
-  String? _time;
+  String? _checkInTime; // Check-in time
+  String? _checkOutTime; // Check-out time
   String? _day; // Selected day
   String? _subject;
   String? _class;
@@ -64,7 +66,8 @@ class _AddScheduleState extends State<AddSchedule> {
 
       // Prepare data to be saved
       Map<String, dynamic> scheduleData = {
-        'time': _time,
+        'checkInTime': _checkInTime, // Save check-in time
+        'checkOutTime': _checkOutTime, // Save check-out time
         'day': _day,
         'subject': _subject?[0],
         'class': _class,
@@ -95,25 +98,42 @@ class _AddScheduleState extends State<AddSchedule> {
     }
   }
 
-  // Method to show the day selection bottom sheet
   void _selectDay() {
     showModalBottomSheet(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),  
       context: context,
       builder: (BuildContext context) {
         return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8)
+          ),
           height: 250,
           child: Column(
             children: [
-              ListTile(
-                title: Text('Select Day'),
-                trailing: IconButton(
-                  icon: Icon(Icons.close),
-                  onPressed: () => Navigator.pop(context),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Select Day',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, color: Colors.red),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
                 ),
               ),
               Expanded(
                 child: ListView(
-                  children: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) {
+                  children: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day) {
                     return ListTile(
                       title: Text(day),
                       onTap: () {
@@ -136,105 +156,236 @@ class _AddScheduleState extends State<AddSchedule> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Admin Page')),
+      backgroundColor: Colors.grey.shade50,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              // Dropdown for selecting a user
               _isLoading
                   ? CircularProgressIndicator()
-                  : DropdownButtonFormField<String>(
-                value: _selectedUserId,
-                decoration: InputDecoration(labelText: 'Select User'),
-                items: _users.map((user) {
-                  return DropdownMenuItem<String>(
-                    value: user['id'],
-                    child: Text(user['name']),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedUserId = value;
-                    _fetchUserSubjects(value!); // Fetch subjects for the selected user
-                  });
-                },
-                validator: (value) {
-                  if (value == null) {
-                    return 'Please select a user';
-                  }
-                  return null;
-                },
-              ),
-              // Display subjects as radio buttons if there are 1 or 2
+                  : GestureDetector(
+                      onTap: _selectUser, // Trigger user selection modal
+                      child: Card(
+                        color: Colors.white, // Set card color to white
+                        elevation: 0, // Remove card outline
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: InputDecorator(
+                            decoration: InputDecoration(
+                              hintText: _selectedUserId != null
+                                  ? _users.firstWhere((user) => user['id'] == _selectedUserId)['name']
+                                  : 'Select User', // Show selected user's name or hint text
+                              border: InputBorder.none, // Remove input border inside card
+                            ),
+                            child: Text(
+                              _selectedUserId != null
+                                  ? _users.firstWhere((user) => user['id'] == _selectedUserId)['name']
+                                  : 'Tap to select a user',
+                              style: TextStyle(
+                                color: _selectedUserId == null ? Colors.grey : Colors.black,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
               if (_userSubjects.length > 0 && _userSubjects.length <= 2) ...[
                 Text('Select Subject:'),
                 ..._userSubjects.map((subject) {
-                  return RadioListTile<String>(
-                    title: Text(subject),
-                    value: subject,
-                    groupValue: _subject,
-                    onChanged: (value) {
-                      setState(() {
-                        _subject = value;
-                      });
-                    },
+                  return Card(
+                    color: Colors.white,
+                    elevation: 0, // Remove card outline
+                    child: RadioListTile<String>(
+                      title: Text(subject),
+                      value: subject,
+                      groupValue: _subject,
+                      onChanged: (value) {
+                        setState(() {
+                          _subject = value;
+                        });
+                      },
+                    ),
                   );
                 }).toList(),
               ],
-              // If more than 2 subjects, use a regular TextFormField
               if (_userSubjects.length > 2) ...[
-                TextFormField(
-                  decoration: InputDecoration(labelText: 'Subject (comma separated)'),
+                Card(
+                  color: Colors.white,
+                  elevation: 0, // Remove card outline
+                  child: TextFormField(
+                    decoration: InputDecoration(
+                      hintText: 'Subject (comma separated)', // Changed labelText to hintText
+                      border: InputBorder.none, // Remove input border inside card
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a subject';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) => _subject = value,
+                  ),
+                ),
+              ],
+              Row(
+                children: [
+                  Expanded(
+                    child: Card(
+                      color: Colors.white,
+                      elevation: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            hintText: 'Check In', // Changed labelText to hintText
+                            border: InputBorder.none, // Remove input border inside card
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter check-in time';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) => _checkInTime = value,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Card(
+                      color: Colors.white,
+                      elevation: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            hintText: 'Check Out',
+                            border: InputBorder.none,
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter check-out time';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) => _checkOutTime = value,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              GestureDetector(
+                onTap: _selectDay,
+                child: Card(
+                  color: Colors.white,
+                  elevation: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: InputDecorator(
+                      decoration: InputDecoration(
+                        hintText: 'Select Day', // Changed labelText to hintText
+                        border: InputBorder.none, // Remove input border inside card
+                      ),
+                      child: Text(
+                        _day ?? 'Tap to select a day',
+                        style: TextStyle(
+                          color: _day == null ? Colors.grey : Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Card(
+                color: Colors.white,
+                elevation: 0, // Remove card outline
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'Class', // Changed labelText to hintText
+                    border: InputBorder.none, // Remove input border inside card
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a subject';
+                      return 'Please enter class';
                     }
                     return null;
                   },
-                  onSaved: (value) => _subject = value,
-                ),
-              ],
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Time'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a time';
-                  }
-                  return null;
-                },
-                onSaved: (value) => _time = value,
-              ),
-              // Button to select day
-              GestureDetector(
-                onTap: _selectDay,
-                child: InputDecorator(
-                  decoration: InputDecoration(labelText: 'Select Day'),
-                  child: Text(_day ?? 'Tap to select a day', style: TextStyle(color: _day == null ? Colors.grey : Colors.black)),
+                  onSaved: (value) => _class = value,
                 ),
               ),
-
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Class'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a class';
-                  }
-                  return null;
-                },
-                onSaved: (value) => _class = value,
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _submitSchedule,
-                child: Text('Create Schedule'),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: BuildButton(
+                  onPressed: _submitSchedule,
+                  text: 'Save',
+                
+                ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  void _selectUser() {
+    showModalBottomSheet(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          height: 250,
+          child: Column(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Select User',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, color: Colors.red),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _users.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final user = _users[index];
+                    return ListTile(
+                      title: Text(user['name']),
+                      onTap: () {
+                        setState(() {
+                          _selectedUserId = user['id']; // Save the selected user ID
+                          _fetchUserSubjects(_selectedUserId!); // Fetch subjects for selected user
+                        });
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

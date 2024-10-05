@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart'; // For date formatting
+import 'package:intl/intl.dart';
+import 'package:som_mobile/const/app_color.dart';
 
 class UserDetailPage extends StatefulWidget {
   final String userId;
@@ -190,8 +191,21 @@ class _UserDetailPageState extends State<UserDetailPage> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('User Details'),
+          backgroundColor: AppColor.blueColor,
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back, color: Colors.white), // Back button icon
+        onPressed: () {
+          Navigator.pop(context); // Go back to the previous screen
+        },
+      ),
+      title: Text(
+        'User Detail',
+        style: TextStyle(color: Colors.white),
+      ),
+      centerTitle: false,
           bottom: TabBar(
+            labelColor:Colors.white,
+            unselectedLabelColor: Colors.grey,
             tabs: [
               Tab(text: 'Schedule'),
               Tab(text: 'Attendance'),
@@ -229,7 +243,15 @@ class _UserDetailPageState extends State<UserDetailPage> {
                     rows: schedules.map<DataRow>((schedule) {
                       return DataRow(cells: [
                         DataCell(Text(schedule['day'] ?? '')),
-                        DataCell(Text(schedule['time'] ?? '')),
+                        DataCell(
+                        Row(
+                          children: [
+                            Text(schedule['checkInTime'] ?? ''), // Display check-in time or fallback to empty
+                            Text(' - '), // Add some spacing between the two times
+                            Text(schedule['checkOutTime'] ?? '') // Display check-out time or fallback to empty
+                          ],
+                        ),
+                      ),
                         DataCell(Text(schedule['subject'] ?? '')),
                         DataCell(Text(schedule['class'] ?? '')),
                       ]);
