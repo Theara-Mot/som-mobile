@@ -21,7 +21,7 @@ Future<void> main() async {
   runApp(
     EasyLocalization(
       supportedLocales: [Locale('en', 'US'), Locale('km', 'KM'), Locale('ko', 'KR'),],
-      path: 'assets/lang', // Path to the translation JSON files
+      path: 'assets/lang', 
       fallbackLocale: Locale('en', 'US'),
       child: MyApp(),
     ),
@@ -87,9 +87,9 @@ class _MainPageState extends State<MainPage> {
 
   List<Widget> _buildScreens() {
     return [
-      const Homepage(), // Replace with your actual homepage widget
+      const Homepage(), 
       AdminPage(),
-      UserDataScreen(), // Replace with your actual profile page
+      UserDataScreen(),
     ];
   }
 
@@ -97,19 +97,19 @@ class _MainPageState extends State<MainPage> {
     return [
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.home),
-        title: ("Home"),
+        title: tr('home'), 
         activeColorPrimary: Colors.deepPurple,
         inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.admin_panel_settings_outlined),
-        title: ("Admin"),
+        title: tr('admin'),  
         activeColorPrimary: Colors.deepPurple,
         inactiveColorPrimary: Colors.grey,
       ),
       PersistentBottomNavBarItem(
         icon: const Icon(Icons.person),
-        title: ("Profile"),
+        title: tr('profile'),  
         activeColorPrimary: Colors.deepPurple,
         inactiveColorPrimary: Colors.grey,
       ),
@@ -123,10 +123,10 @@ class _MainPageState extends State<MainPage> {
       controller: _controller,
       screens: _buildScreens(),
       items: _navBarsItems(),
-      backgroundColor: Colors.white, // Default nav bar background color
-      handleAndroidBackButtonPress: true, // Whether to handle Android back button
-      resizeToAvoidBottomInset: true, // Avoid overlapping of the bottom nav bar with the keyboard
-      stateManagement: true, // Whether you want to manage tabs state
+      backgroundColor: Colors.white,
+      handleAndroidBackButtonPress: true, 
+      resizeToAvoidBottomInset: true, 
+      stateManagement: true, 
       decoration: NavBarDecoration(
         borderRadius: BorderRadius.circular(10.0),
         colorBehindNavBar: Colors.white,

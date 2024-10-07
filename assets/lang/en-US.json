@@ -1,5 +1,7 @@
 {
   "profile": "Profile",
+  "home":"Home",
+  "admin":"Admin",
   "logout": "Logout",
   "change_language": "Change Language",
   "khmer": "ខ្មែរ",

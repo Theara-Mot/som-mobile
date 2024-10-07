@@ -1,6 +1,8 @@
 {
   "profile": "프로필",
   "logout": "로그아웃",
+  "home": "홈",
+  "admin": "관리자",
   "change_language": "언어 변경",
   "khmer": "크메르어",
   "english": "영어",

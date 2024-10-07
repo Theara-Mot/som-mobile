@@ -197,18 +197,21 @@ class _UserDataScreenState extends State<UserDataScreen> {
                         GestureDetector(
                           onTap: () {
                             context.setLocale(Locale('km', 'KM'));
+                            setState(() {});
                           },
                           child: buildTile(Icons.flag, tr('khmer'), showTick: context.locale.languageCode == 'km'),
                         ),
                         GestureDetector(
                           onTap: () {
                             context.setLocale(Locale('en', 'US'));
+                            setState(() {});
                           },
                           child: buildTile(Icons.flag, tr('english'), showTick: context.locale.languageCode == 'en'),
                         ),
                         GestureDetector(
                           onTap: () {
                             context.setLocale(Locale('ko', 'KR'));
+                            setState(() {});
                           },
                           child: buildTile(Icons.flag, tr('korea'), showTick: context.locale.languageCode == 'ko'),
                         ),
