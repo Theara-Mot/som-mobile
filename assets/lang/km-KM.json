@@ -1,0 +1,22 @@
+{
+  "profile": "ប្រវត្តិ",
+  "logout": "ចាកចេញ",
+  "change_language": "ប្ដូរភាសា",
+  "khmer": "Khmer",
+  "english": "អង់គ្លេស",
+  "name": "ឈ្មោះ",
+  "gender": "ភេទ",
+  "dob": "ថ្ងៃកំណើត",
+  "phone": "ទូរស័ព្ទ",
+  "level": "កម្រិត",
+  "main_subject": "មុខវិជ្ជាសំខាន់",
+  "join_date": "ថ្ងៃចូល",
+  "duration_worked": "រយៈពេលធ្វើការ",
+  "infor": "ព័ត៌មានរបស់អ្នក",
+  "confirm_logout": "តើអ្នកប្រាកដថាចង់ចាកចេញមែនទេ?",
+  "cancel": "បោះបង់",
+  "personal_information": "ព័ត៌មានផ្ទាល់ខ្លួន",
+  "additional_information": "ព័ត៌មានបន្ថែម",
+  "role": "តួនាទី",
+  "department": "ការិយាល័យ"
+}

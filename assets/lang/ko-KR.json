@@ -1,0 +1,22 @@
+{
+  "profile": "프로필",
+  "logout": "로그아웃",
+  "change_language": "언어 변경",
+  "khmer": "크메르어",
+  "english": "영어",
+  "name": "이름",
+  "gender": "성별",
+  "dob": "생년월일",
+  "phone": "전화",
+  "level": "레벨",
+  "main_subject": "주요 과목",
+  "join_date": "가입일",
+  "duration_worked": "근무 기간",
+  "infor": "당신의 정보",
+  "confirm_logout": "로그아웃하시겠습니까?",
+  "cancel": "취소",
+  "personal_information": "개인 정보",
+  "additional_information": "추가 정보",
+  "role": "역할",
+  "department": "부서"
+}

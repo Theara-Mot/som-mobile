@@ -7,17 +7,19 @@ import 'package:intl/intl.dart';
 import 'package:som_mobile/screen/auth/login.dart';
 import 'package:som_mobile/util/build_appbar.dart';
 import 'package:som_mobile/util/build_button.dart';
-import '../model/user_model.dart';
-import '../service/class_service.dart';
 
-class UserDataScreen extends StatefulWidget {
-  UserDataScreen({Key? key}) : super(key: key);
+import '../../../model/user_model.dart';
+import '../../../service/class_service.dart';
+
+class UserProfile extends StatefulWidget {
+  final String userID;
+  UserProfile({Key? key, required this.userID}) : super(key: key);
 
   @override
-  _UserDataScreenState createState() => _UserDataScreenState();
+  _UserProfileState createState() => _UserProfileState();
 }
 
-class _UserDataScreenState extends State<UserDataScreen> {
+class _UserProfileState extends State<UserProfile> {
   NameService nameService = NameService('subjects');
   List<String> names = [];
   String levelName = '';
@@ -124,22 +126,16 @@ class _UserDataScreenState extends State<UserDataScreen> {
       return 'Error fetching user $col';
     }
   }
+  Stream<DocumentSnapshot> getUserStream() {
+    return FirebaseFirestore.instance.collection('users').doc(widget.userID).snapshots();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final User? user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      return Scaffold(
-        appBar: BuildAppbar(title: tr('profile')),
-        body: Center(child: Text(tr('no_user_signed_in'))),
-      );
-    }
-
     return Scaffold(
       backgroundColor: Colors.grey.shade200,
-      appBar: BuildAppbar(title: tr('profile')),
       body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
+        stream: getUserStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -149,25 +145,17 @@ class _UserDataScreenState extends State<UserDataScreen> {
             print('Error: ${snapshot.error}');
             return Center(child: Text('Error: ${snapshot.error}'));
           }
-          if (!snapshot.hasData || !snapshot.data!.exists) {
-            print('No data found for user ${user.uid}');
-            return Center(child: BuildButton(text: 'Login', onPressed: (){
-              Navigator.of(context, rootNavigator: true).push(
-                MaterialPageRoute(builder: (BuildContext context) {
-                  return LoginScreen();
-                }),
-              );
-            }));
+
+          if (!snapshot.hasData || snapshot.data == null) {
+            return Center(child: Text('No data found'));
           }
 
           final data = snapshot.data!.data() as Map<String, dynamic>;
-          UserModel currentUser = UserModel.fromMap(data, user.uid);
+          UserModel currentUser = UserModel.fromMap(data, widget.userID);
           DateTime joinDate = currentUser.joinDate;
           Map<String, int> duration = calculateDuration(joinDate);
-          fetchName('levels',currentUser.levelId).toString();
-          fetchName('departments',currentUser.departmentId).toString();
-          fetchName('roles',currentUser.roleId).toString();
-          // Load names and levelName asynchronously
+
+          // Fetch names if they are empty
           if (names.isEmpty) {
             getNamesByIds(currentUser.subjects).then((loadedNames) {
               setState(() {
@@ -182,40 +170,6 @@ class _UserDataScreenState extends State<UserDataScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.lightBlueAccent.withOpacity(0.1),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(tr('change_language'),
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, fontFamily: 'Khmer')),
-                        const Divider(),
-                        GestureDetector(
-                          onTap: () {
-                            context.setLocale(Locale('km', 'KM'));
-                          },
-                          child: buildTile(Icons.flag, tr('khmer'), showTick: context.locale.languageCode == 'km'),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            context.setLocale(Locale('en', 'US'));
-                          },
-                          child: buildTile(Icons.flag, tr('english'), showTick: context.locale.languageCode == 'en'),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            context.setLocale(Locale('ko', 'KR'));
-                          },
-                          child: buildTile(Icons.flag, tr('korea'), showTick: context.locale.languageCode == 'ko'),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -248,22 +202,15 @@ class _UserDataScreenState extends State<UserDataScreen> {
                         Text(tr('additional_information'),
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, fontFamily: 'Khmer')),
                         const Divider(),
-                        buildTile(Icons.grade, '${tr('level')}: ${levelName ?? 'Loading...'}'), // Display level name here
-                        buildTile(Icons.subject, '${tr('main_subject')}:${names.isNotEmpty ? names.join(', ') : 'Loading...'}'),
-                        buildTile(Icons.grade, '${tr('department')}: ${departmentName ?? 'Loading...'}'),
-                        buildTile(Icons.grade, '${tr('role')}: ${roleName}'),
+                        buildTile(Icons.grade, '${tr('level')}: ${levelName.isNotEmpty ? levelName : 'Loading...'}'),
+                        buildTile(Icons.subject, '${tr('main_subject')}: ${names.isNotEmpty ? names.join(', ') : 'Loading...'}'),
+                        buildTile(Icons.grade, '${tr('department')}: ${departmentName.isNotEmpty ? departmentName : 'Loading...'}'),
+                        buildTile(Icons.grade, '${tr('role')}: ${roleName.isNotEmpty ? roleName : 'Loading...'}'),
                         buildTile(Icons.date_range, '${tr('join_date')}: ${DateFormat('yyyy-MM-dd').format(joinDate)}'),
                         buildTile(Icons.access_time,
                             '${tr('duration_worked')}: ${duration['years']} years, ${duration['months']} months, ${duration['days']} days'),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  BuildButton(
-                    text: tr('logout'),
-                    onPressed: () {
-                      _showLogoutConfirmationDialog(context);
-                    },
                   ),
                 ],
               ),
@@ -274,30 +221,4 @@ class _UserDataScreenState extends State<UserDataScreen> {
     );
   }
 
-  void _showLogoutConfirmationDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return CupertinoAlertDialog(
-          title: Text(tr('logout'), style: TextStyle(fontFamily: 'Khmer')),
-          content: Text(tr('confirm_logout'), style: TextStyle(fontFamily: 'Khmer')),
-          actions: [
-            TextButton(
-              child: Text(tr('cancel'), style: TextStyle(fontFamily: 'Khmer')),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            TextButton(
-              child: Text(tr('logout'), style: TextStyle(fontFamily: 'Khmer', color: Colors.redAccent)),
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-                Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => LoginScreen()));
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 }

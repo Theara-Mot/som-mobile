@@ -1,0 +1,22 @@
+{
+  "profile": "Profile",
+  "logout": "Logout",
+  "change_language": "Change Language",
+  "khmer": "ខ្មែរ",
+  "english": "English",
+  "name": "Name",
+  "gender": "Gender",
+  "dob": "Date of Birth",
+  "phone": "Phone",
+  "level": "Level",
+  "main_subject": "Main Subject",
+  "join_date": "Join Date",
+  "duration_worked": "Duration Worked",
+  "infor": "Your Information",
+  "confirm_logout": "Are you sure to logout?",
+  "cancel": "Cancel",
+  "personal_information": "Personal Information",
+  "additional_information": "Additional Information",
+  "role": "Role",
+  "department": "Department"
+}

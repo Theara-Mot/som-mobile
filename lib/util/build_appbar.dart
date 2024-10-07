@@ -12,7 +12,7 @@ class BuildAppbar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: backgroundColor,
       title: Text(
         title,
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(color: Colors.white,fontFamily: 'Khmer', ),
       ),
       centerTitle: false,
     );

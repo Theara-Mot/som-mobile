@@ -12,7 +12,7 @@ class BuildButton extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 24.0),
+        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 24.0),
         margin: EdgeInsets.symmetric(vertical: 8.0),
         decoration: BoxDecoration(
           color: AppColor.blueColor, 
@@ -31,8 +31,9 @@ class BuildButton extends StatelessWidget {
             text,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 14.0,
+              fontSize: 16.0,
               fontWeight: FontWeight.w500,
+                fontFamily: 'Khmer'
             ),
           ),
         ),
